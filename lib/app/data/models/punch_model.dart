@@ -24,7 +24,7 @@ class PunchModel extends HiveObject {
 
   @HiveField(5)
   bool? isSync ;
-
+  
   @HiveField(6)
   bool isLoading;
 
@@ -33,6 +33,9 @@ class PunchModel extends HiveObject {
 
   @HiveField(8)
   int? user_id;
+
+  @HiveField(9)
+  bool? isPunchin;
 
   PunchModel({
    this.id,
@@ -43,7 +46,8 @@ class PunchModel extends HiveObject {
    this.isSync,
    this.isLoading=false,
    this.error,
-   this.user_id
+   this.user_id,
+   this.isPunchin
   });
 
   // Factory method to create a new PunchModel with a unique ID
@@ -55,7 +59,8 @@ class PunchModel extends HiveObject {
     bool? isSync,
     bool isLoading=false,
     String? error,
-    int? user_id
+    int? user_id,
+    bool? isPunchin
   }) {
     return PunchModel(
       id: Uuid().v4(),  // Generates a unique ID
@@ -66,7 +71,8 @@ class PunchModel extends HiveObject {
       isSync: isSync,
       isLoading: isLoading,
       error: error,
-      user_id: user_id
+      user_id: user_id,
+      isPunchin: isPunchin
     );
   }
 

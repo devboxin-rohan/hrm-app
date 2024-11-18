@@ -6,31 +6,46 @@ class AppTheme {
     primaryColor: AppColors.primary,
     scaffoldBackgroundColor: AppColors.secondary,
     fontFamily: "roboto",
-    // Use colorScheme to set your colors
     colorScheme: const ColorScheme.light(
       primary: AppColors.primary,
       secondary: AppColors.secondary,
-      // You can define additional colors if needed
       background: AppColors.secondary,
-      surface: AppColors.black, // Add if needed
-      error: AppColors.black, // Add if needed
+      surface: AppColors.black,
+      error: AppColors.black,
     ),
     appBarTheme: const AppBarTheme(
       backgroundColor: AppColors.primary,
       elevation: 0,
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.primary, // Set the background color
+        foregroundColor: Colors.white, // Set the text color
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8), // Optional: Rounded corners
+        ),
+      ),
     ),
   );
 
   static final ThemeData darkTheme = ThemeData(
     primaryColor: AppColors.primary,
     scaffoldBackgroundColor: Colors.black,
-    // Use colorScheme to set your colors
     colorScheme: const ColorScheme.dark(
       primary: AppColors.primary,
       secondary: AppColors.secondary,
       background: Colors.black,
-      surface: AppColors.black, // Add if needed
-      error: AppColors.black, // Add if needed
+      surface: AppColors.black,
+      error: AppColors.black,
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.secondary, // Set background for dark theme
+        foregroundColor: Colors.black, // Set text color for contrast
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
     ),
   );
 }
