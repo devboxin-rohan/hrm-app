@@ -1,6 +1,7 @@
 import 'package:hive/hive.dart';
 import 'package:hrm_app/app/data/models/punch_model.dart';
 import 'package:hrm_app/app/data/models/user_model.dart';
+import 'package:hrm_app/app/modules/auth/auth_controller.dart';
 
 class HiveDatabase {
   static const String employeeBoxName = "employeeBox";

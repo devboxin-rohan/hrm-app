@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:hrm_app/app/data/models/punch_model.dart';
 import 'package:hrm_app/app/modules/punch/punch_controller.dart';
 import 'package:hrm_app/app/theme/app_colors.dart';
+import 'package:hrm_app/app/utils/PunchAsyncData.dart';
 
 class PunchList extends StatefulWidget {
   Key? key;
@@ -92,7 +93,7 @@ class _PunchList extends State<PunchList> with WidgetsBindingObserver {
                 ),
                 ElevatedButton.icon(
                   onPressed: () {
-                    // BackgroundWorkDispatcher.SubmitPunchData();
+                    BackgroundWorkDispatcher.SubmitPunchData();
                   },
                   icon: Icon(Icons.sync),
                   label: const Text("Sync"),
@@ -207,6 +208,12 @@ class CardDetails extends StatelessWidget {
                   ),
                   Row(
                     children: [
+                    details.isPunchin! ? 
+                    Text("Punch-in",style: AppColors.linkTextStyle.copyWith(color: AppColors.green),)
+                    :
+                    Text("Punch-out",style: AppColors.linkTextStyle.copyWith(color: AppColors.red)),
+                      
+                      SizedBox(width: 5,),
                       details.isLoading
                           ? CircularProgressIndicator()
                           : CircleAvatar(

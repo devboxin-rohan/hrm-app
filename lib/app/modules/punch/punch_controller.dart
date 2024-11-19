@@ -39,7 +39,8 @@ class PunchController extends GetxController {
   void loadPunchData() async {
   punchBox = await Hive.box<PunchModel>('punchBox');
   // Load data in reverse order to show the newest punches at the top
-  punchList.assignAll(punchBox.values.toList().reversed);
+  punchList.assignAll(punchBox.values.toList()
+      ..sort((a, b) => b.dateTime!.compareTo(a.dateTime!)));
 }
 
 void addPunch(PunchModel punch) {
@@ -145,9 +146,9 @@ void addPunch(PunchModel punch) {
 
       // Process punch data
       bool isPunched = await punchData(imageFile,isPunchin);
-      // if (isPunched) {
-      //   // Get.toNamed("/home");
-      // }
+      if (isPunched) {
+        Get.toNamed("/home");
+      }
 
       return true;
     } catch (e) {

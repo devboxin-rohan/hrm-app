@@ -7,7 +7,7 @@ class AttendanceService {
   Future<Response> SubmitPunchIn(data) async {
     // print(data);
     return await networkClinet.sendRequest(
-        endPoint: '${NetworkClient().BaseURL}/modules-hrm/punch_in_out',
+        endPoint: '${NetworkClient().BaseURL}/modules-hrm/raw-data',
         method: "POST",
         data: data);
   }

@@ -5,7 +5,7 @@ import 'package:hrm_app/app/data/local/local_storage.dart';
 import 'package:hrm_app/app/utils/logging.dart';
 
 class NetworkClient {
-  String BaseURL = "https://hrm-qa-ss.developerbox.co.in/api";
+  String BaseURL = "https://hrm.developerbox.co.in/api";
 
   Future<Response> sendRequest({
     required String endPoint,
@@ -34,13 +34,12 @@ class NetworkClient {
               "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"
         }),
       );
-      Logging().LoggerPrint(response.toString());
 
+      Logging().LoggerPrint(response.toString());
       return response;
 
     } catch (e) {
       Logging().LoggerPrint(e.toString());
-
       throw ErrorHandler.handle(e);
     }
   }

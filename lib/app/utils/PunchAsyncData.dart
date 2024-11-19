@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:hrm_app/app/data/models/punch_model.dart';
 import 'package:hrm_app/app/modules/punch/punch_controller.dart';
 import 'package:hrm_app/app/service/attendance.dart';
 import 'package:hrm_app/app/service/index.dart';
@@ -25,7 +26,7 @@ class BackgroundWorkDispatcher {
 
       // print(unsyncedPunches);
 
-      for (var punch in unsyncedPunches) {
+      for (PunchModel punch in unsyncedPunches) {
         File image = File(punch.imagePath!);
         String fileName = basename(image.path);
         punch.isLoading = true;
@@ -35,10 +36,12 @@ class BackgroundWorkDispatcher {
           var payload = dio.FormData.fromMap({
             'longitude': punch.longitude,
             'latitude': punch.latitude,
-            'image_file': await dio.MultipartFile.fromFile(
+            'image_path': await dio.MultipartFile.fromFile(
               image.path,
               filename: fileName,
             ),
+            'date':punch.dateTime!.substring(0,10),  
+            'time':punch.dateTime!.substring(12,19)
           });
 
           var response = await AttendanceService().SubmitPunchIn(payload);
