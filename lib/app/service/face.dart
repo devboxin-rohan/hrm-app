@@ -13,7 +13,7 @@ class FaceService {
 
   Future<Response> RecognizeFace(data) async {
     return await networkClinet.sendRequest(
-        endPoint: '${FaceNetworkCLient().BaseURL}/recognize_with_user_id',
+        endPoint: '${FaceNetworkCLient().BaseURL}/verify',
         method: "POST",
         data: data
     );
@@ -21,7 +21,7 @@ class FaceService {
 
   Future<Response> IsFaceExist(id) async {
     return await networkClinet.sendRequest(
-      endPoint: '${FaceNetworkCLient().BaseURL}/check_face_existence/?user_id=${id}',
+      endPoint: '${FaceNetworkCLient().BaseURL}/check_face_existence/${id}',
       method: "GET",
     );
   }

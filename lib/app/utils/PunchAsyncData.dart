@@ -49,6 +49,7 @@ class BackgroundWorkDispatcher {
           if (response.data["success"] == true) {
             punch.isLoading = false;
             punch.isSync = true;
+            punch.error=null;
             punchController.updatePunch(punch.id!, punch);
             // AlertMessage().Success(context, response.data["reason"], 2000);
           } else {
