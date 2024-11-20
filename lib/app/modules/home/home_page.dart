@@ -44,6 +44,7 @@ class _HomePage extends State<HomePage> {
     // fetchDetails();
     handlePermissions();
     return Scaffold(
+      appBar: AppBar(),
       backgroundColor: AppColors.secondary,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

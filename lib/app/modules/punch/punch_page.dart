@@ -77,8 +77,7 @@ class _punchPage extends State<PunchPage> {
                     .2 ,),
           Container(
             width:
-                MediaQuery.of(navigatorKey.currentState!.context).size.width *
-                    .7,
+                MediaQuery.of(navigatorKey.currentState!.context).size.width ,
             height:
                 MediaQuery.of(navigatorKey.currentState!.context).size.width *
                     1.5,

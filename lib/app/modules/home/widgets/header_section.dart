@@ -39,7 +39,7 @@ class _headerSection extends State<HeaderSection> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.asset("assets/image/devlogo.png",width: MediaQuery.of(context).size.width*.5,),
+            // Image.asset("assets/image/devlogo.png",width: MediaQuery.of(context).size.width*.5,),
             SizedBox(height: 10,),
              SizedBox(width: MediaQuery.of(navigatorKey.currentState!.context).size.width*.5,
            child:Text("Good morning, ${name}", style: AppColors.labelTextStyle,overflow: TextOverflow.ellipsis,),),

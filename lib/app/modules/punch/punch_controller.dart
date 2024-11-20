@@ -37,10 +37,12 @@ class PunchController extends GetxController {
     loadPunchData();
   }
 
-  void loadPunchData() async{
+  void loadPunchData() async {
     AuthController controller = Get.find<AuthController>();
     var response = await controller.getUserData();
-    punchList.assignAll(punchBox.values.where((punch) => punch.user_id == response!.empId).toList());
+    punchList.assignAll(punchBox.values
+        .where((punch) => punch.user_id == response!.empId)
+        .toList());
   }
 
   void addPunch(PunchModel punch) {
@@ -49,7 +51,7 @@ class PunchController extends GetxController {
     punchList.insert(0, punch);
     isAdding.value = false; // Set loading state to true
 
-     BackgroundWorkDispatcher.SubmitPunchData();
+    BackgroundWorkDispatcher.SubmitPunchData();
   }
 
   void updatePunch(String id, PunchModel updatedPunch) {
@@ -94,57 +96,60 @@ class PunchController extends GetxController {
   }
 
   void Register(CameraController cameraController) async {
-  if (cameraController != null &&
-      cameraController.value.isInitialized &&
-      !isProcessing.value) {
-    isProcessing.value = true;
-
-    try {
-      // Capture an image from the camera
-      XFile? imageFile = await cameraController.takePicture();
-      
-      // Check if the file was actually created
-      if (imageFile == null || !(await File(imageFile.path).exists())) {
-        print("Error: Captured image file not found at path: ${imageFile?.path}");
-        isProcessing.value = false;
-        return;
-      }
-
-      // Convert XFile to File for compatibility
-      File image = File(imageFile.path);
-      String fileName = image.path.split('/').last;
-
-      // Get user data for form submission
-      AuthController controller = Get.find<AuthController>();
-      var response = await controller.getUserData();
-
-      // Prepare form data with image file and user information
-      dio.FormData formData = dio.FormData.fromMap({
-        "user_id": response!.empId,
-        "file": await dio.MultipartFile.fromFile(image.path, filename: fileName),
-        "userName": response.name,
-      });
-
-      // Print form data fields for debugging
-      print("Form Data Fields: ${formData.fields}");
+    if (cameraController != null &&
+        cameraController.value.isInitialized &&
+        !isProcessing.value) {
+      isProcessing.value = true;
 
       try {
-        // Send the form data
-        dio.Response res = await FaceService().RegisterFace(formData);
-        AlertNotification.success(res.data["message"], "");
-        Get.toNamed("/home");
-      } catch (error) {
-        print("Error during face registration: $error");
-        AlertNotification.error("Registration Failed", "Unable to register face");
-        Get.toNamed("/home");
+        // Capture an image from the camera
+        XFile? imageFile = await cameraController.takePicture();
+
+        // Check if the file was actually created
+        if (imageFile == null || !(await File(imageFile.path).exists())) {
+          print(
+              "Error: Captured image file not found at path: ${imageFile?.path}");
+          isProcessing.value = false;
+          return;
+        }
+
+        // Convert XFile to File for compatibility
+        File image = File(imageFile.path);
+        String fileName = image.path.split('/').last;
+
+        // Get user data for form submission
+        AuthController controller = Get.find<AuthController>();
+        var response = await controller.getUserData();
+
+        // Prepare form data with image file and user information
+        dio.FormData formData = dio.FormData.fromMap({
+          "emp_id": response!.empId,
+          "emp_image":
+              await dio.MultipartFile.fromFile(image.path, filename: fileName),
+          "userName": response.name,
+        });
+
+        // Print form data fields for debugging
+        print("Form Data Fields: ${formData.fields}");
+
+        try {
+          // Send the form data
+          dio.Response res = await FaceService().RegisterFace(formData);
+          AlertNotification.success(res.data["message"], "");
+          Get.toNamed("/home");
+        } catch (error) {
+          print("Error during face registration: $error");
+          AlertNotification.error(
+              "Registration Failed", "Unable to register face");
+          Get.toNamed("/home");
+        }
+      } catch (e) {
+        print("Exception: $e");
+      } finally {
+        isProcessing.value = false;
       }
-    } catch (e) {
-      print("Exception: $e");
-    } finally {
-      isProcessing.value = false;
     }
   }
-}
 
   void runRecognize(CameraController cameraController) {
     timer.value = Timer.periodic(
@@ -169,23 +174,28 @@ class PunchController extends GetxController {
             await dio.MultipartFile.fromFile(image.path, filename: fileName);
 
         dio.FormData formData = dio.FormData.fromMap({
-          "user_id": response!.empId,
-          "file": file,
+          "emp_id": response!.empId,
+          "emp_image": file,
         });
 
         try {
           dio.Response response = await FaceService().RecognizeFace(formData);
-          AlertNotification.success(
-              "Face found successfully", response.data["message"]);
-          faceFound.value = true;
-          isLoading.value = true;
-          bool isPunched = await punchData(imageFile);
-          if (isPunched) {
+          if (response.data["success"] == true) {
+            AlertNotification.success(
+                "Face found successfully", response.data["message"]);
+            faceFound.value = true;
+            isLoading.value = true;
+            bool isPunched = await punchData(imageFile);
+            if (isPunched) {
+              isLoading.value = false;
+              Get.toNamed("/home");
+            }
             isLoading.value = false;
-            Get.toNamed("/home");
+            timer.value!.cancel();
+          }else{
+            AlertNotification.error("Failed !", response.data["message"]);
+            faceFound.value = false;
           }
-          isLoading.value = false;
-          timer.value!.cancel();
         } catch (e) {
           AlertNotification.error("Failed !", "Face not recognized");
           faceFound.value = false;
@@ -208,13 +218,12 @@ class PunchController extends GetxController {
       AuthController controller = Get.find<AuthController>();
       var response = await controller.getUserData();
       final punch = PunchModel.create(
-        imagePath: imageFile!.path,
-        latitude: position!.latitude,
-        longitude: position!.longitude,
-        dateTime: timeNDate,
-        isSync: false,
-        user_id: response!.empId
-      );
+          imagePath: imageFile!.path,
+          latitude: position!.latitude,
+          longitude: position!.longitude,
+          dateTime: timeNDate,
+          isSync: false,
+          user_id: response!.empId);
 
       addPunch(punch);
       AlertNotification.success(

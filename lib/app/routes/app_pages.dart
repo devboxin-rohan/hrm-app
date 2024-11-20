@@ -10,20 +10,20 @@ import '../modules/home/home_page.dart';
 class AppPages {
   static const initial = '/auth';
   
-   static Future<String> getToken() async {
-   String token =await  SharedData().getToken();
-   return token;
-   }
+  //  static Future<String> getToken() async {
+  //  String token =await  SharedData().getToken();
+  //  return token;
+  //  }
 
-    static String get initialRoute {
-       String value = getToken();
-        if(value.length>0)
-        return '/auth';
-       else 
-       return '/home';
-    }
+  //   static String get initialRoute {
+  //      String value = getToken();
+  //       if(value.length>0)
+  //       return '/auth';
+  //      else 
+  //      return '/home';
+  //   }
     // return StorageService.isAuthenticated() ? '/home' : '/auth';
-  }
+  
 
   static final routes = [
     GetPage(

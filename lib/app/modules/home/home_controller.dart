@@ -25,7 +25,7 @@ class HomeController extends GetxController {
       isLoading.value = true;
       dio.Response response = await FaceService().IsFaceExist(id);
       print(response.data);
-      if (response.data["exists"] == true) {
+      if (response.data["success"] == true) {
           isFaceExist.value = true;
       } else {
           isFaceExist.value = false;
