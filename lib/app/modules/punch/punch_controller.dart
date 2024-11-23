@@ -4,11 +4,13 @@ import 'package:camera/camera.dart';
 import 'dart:io';
 import 'dart:async';
 import 'package:dio/dio.dart' as dio;
+import 'package:hrm_app/app/data/local/hive_database.dart';
 import 'package:hrm_app/app/data/models/punch_model.dart';
 import 'package:hrm_app/app/modules/auth/auth_controller.dart';
 import 'package:hrm_app/app/service/face.dart';
 import 'package:hrm_app/app/utils/GetCurrentLocation.dart';
 import 'package:hrm_app/app/utils/PunchAsyncData.dart';
+import 'package:hrm_app/app/utils/logging.dart';
 import 'package:hrm_app/app/utils/notifications.dart';
 import 'package:intl/intl.dart';
 import 'package:geolocator/geolocator.dart';
@@ -38,7 +40,7 @@ class PunchController extends GetxController {
   }
 
   void loadPunchData() async{
-    punchBox = Hive.box<PunchModel>('punchBox');
+    punchBox = Hive.box<PunchModel>(HiveDatabase.punchBoxName);
     AuthController controller = Get.find<AuthController>();
     var response = await controller.getUserData();
     punchList.assignAll(punchBox.values.where((punch) => punch.user_id == response!.empId).toList()
@@ -98,7 +100,7 @@ void addPunch(PunchModel punch) {
     // });
   }
 
-  void Register(CameraController cameraController) async {
+  Future Register(CameraController cameraController) async {
     if (cameraController != null &&
         cameraController.value.isInitialized &&
         !isProcessing.value) {
@@ -138,15 +140,21 @@ void addPunch(PunchModel punch) {
         try {
           // Send the form data
           dio.Response res = await FaceService().RegisterFace(formData);
-          AlertNotification.success(res.data["message"], "");
-          Get.toNamed("/home");
+          if(res.data["success"]==true)
+         {AlertNotification.success(res.data["message"], "");
+          Get.toNamed("/home");}
+          else
+          AlertNotification.error("Failed !", res.data["message"]);
+
         } catch (error) {
+          Logging().LoggerPrint(error.toString());
           print("Error during face registration: $error");
           AlertNotification.error(
               "Registration Failed", "Unable to register face");
           Get.toNamed("/home");
         }
       } catch (e) {
+        Logging().LoggerPrint(e.toString());
         print("Exception: $e");
       } finally {
         isProcessing.value = false;
@@ -159,7 +167,7 @@ void addPunch(PunchModel punch) {
         Duration(seconds: 2), (Timer t) => Recognize(cameraController, isPunchin));
   }
 
-  void Recognize(CameraController cameraController,bool isPunchin) async {
+  Future Recognize(CameraController cameraController,bool isPunchin) async {
     if (cameraController != null &&
         cameraController!.value.isInitialized &&
         !isProcessing.value) {
@@ -201,6 +209,7 @@ void addPunch(PunchModel punch) {
           }
         } catch (e) {
           AlertNotification.error("Failed !", "Face not recognized");
+          Logging().LoggerPrint(e.toString());
           faceFound.value = false;
         }
       } catch (e) {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hrm_app/app/modules/home/widgets/PunchBtn.dart';
 import 'package:hrm_app/app/modules/home/widgets/PunchList.dart';
 import 'package:hrm_app/app/theme/app_colors.dart';
+import 'package:hrm_app/app/utils/widgets/AppBar.dart';
 import 'package:hrm_app/main.dart';
 
 class HomePage extends StatefulWidget {
@@ -15,10 +16,10 @@ class _HomePage extends State<HomePage>  with RouteAware{
   @override
   Widget build(BuildContext context) {
     // print(controller.dashboardData.value.name);
-
+    
     return Scaffold(
         // floatingActionButton: helpDesk(isDialOpen),
-        appBar: AppBar(toolbarHeight: 60,),
+        appBar: CustomAppBar(),
         // drawer: Drawer(),
         backgroundColor: AppColors.primary,
         body: Container(

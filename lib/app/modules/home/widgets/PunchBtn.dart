@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hrm_app/app/modules/home/home_controller.dart';
 import 'package:hrm_app/app/utils/CheckPermission.dart';
 import 'package:get/get.dart';
 
@@ -10,13 +11,38 @@ class PunchBtn extends StatefulWidget {
 }
 
 class _PunchBtn extends State<PunchBtn> {
-
-
+   
+  
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    HomeController controller = Get.find<HomeController>();
+    if(controller.isFaceAuthenticationAllowed.value){
+     controller.fetchDetails();
+    }
+  }
 
 
   @override
   Widget build(BuildContext context) {
-    return Row(children: [
+    HomeController controller = Get.find<HomeController>();
+    
+    return Obx((){
+      if(controller.isFaceAuthenticationAllowed.value && !controller.isFaceExist.value)
+      {return  ElevatedButton(
+          style:  ButtonStyle(
+            maximumSize: WidgetStatePropertyAll(Size(MediaQuery.of(context).size.width*1, 45)),
+            minimumSize: WidgetStatePropertyAll(Size(MediaQuery.of(context).size.width*1, 45)),
+          ),
+          onPressed: (){Get.toNamed("punch",arguments:{"isRegister":true});},
+          child: const Text(
+            "Register Face",
+            style: TextStyle(color: Colors.white),
+          ),
+        );}
+      else{
+      return Row(children: [
          ElevatedButton(
           style:  ButtonStyle(
             maximumSize: WidgetStatePropertyAll(Size(MediaQuery.of(context).size.width*.43, 45)),
@@ -40,6 +66,7 @@ class _PunchBtn extends State<PunchBtn> {
             style: TextStyle(color: Colors.white),
           ),
         )
-        ],);
+        ],);}
+    }); 
   }
 }

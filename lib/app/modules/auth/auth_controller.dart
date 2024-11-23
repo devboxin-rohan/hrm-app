@@ -30,11 +30,10 @@ class AuthController extends GetxController {
       if( response.data["success"]==true){
         var userData = response.data["data"]["user"];
         var token = response.data["data"]["token"];
-        print(token);
         print(userData);
         userData["token"]=token;
         SharedData().setToken(token);
-        // await saveUserData(userData);
+        await saveUserData(userData);
         isLoggedIn.value = true;
         Get.offAllNamed('/home');
         AlertNotification.success("Success", "Login Successful");
@@ -58,7 +57,7 @@ class AuthController extends GetxController {
   }
 
    Future<UserModel?> getUserData() async {
-    var box = await Hive.box<UserModel>('userBox');
+    var box = await Hive.box<UserModel>(HiveDatabase.userBoxName);
     return box.get('user');  // Retrieve the user model
   }
 

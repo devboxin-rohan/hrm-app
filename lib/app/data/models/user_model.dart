@@ -5,38 +5,35 @@ part 'user_model.g.dart';
 
 @HiveType(typeId: 0)
 class UserModel extends HiveObject {
-  @HiveField(0)
-  final int id;
 
-  @HiveField(1)
+  @HiveField(0)
   final String name;
 
-  @HiveField(2)
+  @HiveField(1)
   final String email;
 
-  @HiveField(3)
+  @HiveField(2)
   final int? empId;
 
-  @HiveField(4)
+  @HiveField(3)
   final String? emailVerifiedAt;
 
-  @HiveField(5)
+  @HiveField(4)
   final String? biometricId;
 
-  @HiveField(6)
+  @HiveField(5)
   final int isActive;
 
-  @HiveField(7)
-  final int isMobileLogin;
+  @HiveField(6)
+  final int? isMobileLogin;
 
-  @HiveField(8)
+  @HiveField(7)
   final String? mobileLoginCode;
 
-  @HiveField(9)
+  @HiveField(8)
   final String? token;
 
   UserModel({
-    required this.id,
     required this.name,
     required this.email,
     this.empId,
@@ -51,10 +48,9 @@ class UserModel extends HiveObject {
   // Factory constructor to create a UserModel from JSON
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['id'],
       name: json['name'],
       email: json['email'],
-      empId: json['emp_id'],
+      empId: json['id'],
       emailVerifiedAt: json['email_verified_at'],
       biometricId: json["biometric_id"],
       isActive: json["is_active"],
@@ -67,7 +63,6 @@ class UserModel extends HiveObject {
   // Updated toJson method with specific key format
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
       'name': name,
       'email': email,
       'emp_id': empId,

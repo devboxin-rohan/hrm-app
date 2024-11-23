@@ -1,12 +1,11 @@
 import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:hrm_app/app/data/local/local_storage.dart';
 import 'package:hrm_app/app/utils/logging.dart';
 
 class FaceNetworkCLient {
-  String BaseURL = "http://192.168.1.14:8000";
+  String BaseURL = "https://face-api.developerbox.co.in";
 
   Future<Response> sendRequest({
     required String endPoint,

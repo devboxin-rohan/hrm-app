@@ -2,6 +2,7 @@ import 'package:hrm_app/app/modules/home/widgets/PunchList.dart';
 import 'package:hrm_app/app/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hrm_app/app/utils/widgets/AppBar.dart';
 
 class PunchListScreen extends StatefulWidget {
   @override
@@ -14,7 +15,6 @@ class _PunchScreen extends State<PunchListScreen> {
   var dashboardDetails;
   var name;
   
-  
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class _PunchScreen extends State<PunchListScreen> {
 
     return Scaffold(
         // floatingActionButton: helpDesk(isDialOpen),
-        appBar: AppBar(),
+        appBar: CustomAppBar(),
         // drawer: Drawer(),
         backgroundColor: AppColors.primary,
         body: Container(
