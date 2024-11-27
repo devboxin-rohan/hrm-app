@@ -50,6 +50,7 @@ dependencies:
   geolocator: ^13.0.1
   google_mlkit_face_detection: ^0.11.0
   google_mlkit_commons: ^0.7.1
+  dropdown_button2: ^2.3.9
  
 
 dev_dependencies:

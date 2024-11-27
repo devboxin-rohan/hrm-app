@@ -86,10 +86,7 @@ class _PunchList extends State<PunchList> with WidgetsBindingObserver {
               children: [
                 Text(
                   widget.isLoadUnsync ? "Recents" : "Timesheet",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppColors.subheadingStyle,
                 ),
                 ElevatedButton.icon(
                   onPressed: () {

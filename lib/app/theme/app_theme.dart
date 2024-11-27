@@ -10,8 +10,8 @@ class AppTheme {
       primary: AppColors.primary,
       secondary: AppColors.secondary,
       background: AppColors.secondary,
-      surface: AppColors.black,
-      error: AppColors.black,
+      // surface: AppColors.black,
+      // error: AppColors.black,
     ),
     appBarTheme: const AppBarTheme(
       backgroundColor: AppColors.primary,
@@ -26,26 +26,29 @@ class AppTheme {
         ),
       ),
     ),
+    dialogBackgroundColor: AppColors.white,
+
   );
 
   static final ThemeData darkTheme = ThemeData(
     primaryColor: AppColors.primary,
-    scaffoldBackgroundColor: Colors.black,
+    // scaffoldBackgroundColor: Colors.black,
     colorScheme: const ColorScheme.dark(
       primary: AppColors.primary,
       secondary: AppColors.secondary,
-      background: Colors.black,
-      surface: AppColors.black,
-      error: AppColors.black,
+      // background: Colors.black,
+      // surface: AppColors.black,
+      // error: AppColors.black,
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.secondary, // Set background for dark theme
-        foregroundColor: Colors.black, // Set text color for contrast
+        // foregroundColor: Colors.black, // Set text color for contrast
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
       ),
     ),
+    
   );
 }

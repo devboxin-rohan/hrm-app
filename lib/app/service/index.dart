@@ -5,7 +5,7 @@ import 'package:hrm_app/app/data/local/local_storage.dart';
 import 'package:hrm_app/app/utils/logging.dart';
 
 class NetworkClient {
-  String BaseURL = "https://hrm-qa-ss.developerbox.co.in/api";
+  String BaseURL = "https://hrm-qa.developerbox.co.in/api";
 
   Future<Response> sendRequest({
     required String endPoint,

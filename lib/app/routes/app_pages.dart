@@ -3,6 +3,10 @@ import 'package:hrm_app/app/data/local/local_storage.dart';
 import 'package:hrm_app/app/modules/auth/auth_binding.dart';
 import 'package:hrm_app/app/modules/auth/auth_page.dart';
 import 'package:hrm_app/app/modules/home/home_page.dart';
+import 'package:hrm_app/app/modules/leave/leave_binding.dart';
+import 'package:hrm_app/app/modules/leave/leave_page.dart';
+import 'package:hrm_app/app/modules/leave/widget/leave_form/leave_form_binding.dart';
+import 'package:hrm_app/app/modules/leave/widget/leave_form/leave_form_page.dart';
 import 'package:hrm_app/app/modules/punch/punch_binding.dart';
 import 'package:hrm_app/app/modules/punch/punch_page.dart';
 import 'package:hrm_app/app/modules/punch_list/punch_list_binding.dart';
@@ -33,6 +37,16 @@ class AppPages {
       name: '/punch',
       page: () => PunchPage(),
       binding: PunchBinding(),
+    ),
+    GetPage(
+      name: '/leave',
+      page: () => LeavePage(),
+      binding: LeaveBinding(),
+    ),
+    GetPage(
+      name:'/leave-form',
+      page: ()=>LeaveFormPage(),
+      binding: LeaveFormBinding()
     ),
      GetPage(
       name:'/punch-screen',

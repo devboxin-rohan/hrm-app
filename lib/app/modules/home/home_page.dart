@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:hrm_app/app/modules/home/widgets/PunchBtn.dart';
 import 'package:hrm_app/app/modules/home/widgets/PunchList.dart';
 import 'package:hrm_app/app/theme/app_colors.dart';
+import 'package:hrm_app/app/utils/RefreshToken.dart';
 import 'package:hrm_app/app/utils/widgets/AppBar.dart';
+import 'package:hrm_app/app/utils/widgets/BottomNavigationBar.dart';
 import 'package:hrm_app/main.dart';
+import 'package:get/get.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -14,10 +17,18 @@ class HomePage extends StatefulWidget {
 class _HomePage extends State<HomePage>  with RouteAware{
   
   @override
+  initState(){
+    super.initState();
+    checkTimeAndTriggerFunction(navigatorKey.currentState!.context);
+    Timer.periodic(Duration(minutes: 15), (Timer t){checkTimeAndTriggerFunction(navigatorKey.currentState!.context);});
+  }
+
+  @override
   Widget build(BuildContext context) {
     // print(controller.dashboardData.value.name);
     
     return Scaffold(
+        bottomNavigationBar: buildBottomNavigationBar(),
         // floatingActionButton: helpDesk(isDialOpen),
         appBar: CustomAppBar(),
         // drawer: Drawer(),
@@ -78,7 +89,7 @@ class _HomePage extends State<HomePage>  with RouteAware{
                         .size
                         .width *
                     0.4,
-                child: Column(
+                child: const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
@@ -103,7 +114,7 @@ class _HomePage extends State<HomePage>  with RouteAware{
           Container(
             width: 110,
             height: 120, // Reduced height to fit within the container
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage("assets/image/user.png"),
                 fit: BoxFit.cover,
@@ -114,4 +125,13 @@ class _HomePage extends State<HomePage>  with RouteAware{
       ),
     );
   }
+
+
+
+
+
 }
+
+
+
+  
