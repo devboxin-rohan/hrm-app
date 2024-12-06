@@ -7,17 +7,17 @@ class AttendanceService {
   Future<Response> SubmitPunchIn(data) async {
     // print(data);
     return await networkClinet.sendRequest(
-        endPoint: '${NetworkClient().BaseURL}/modules-hrm/raw-data',
+        endPoint: '${NetworkClient().BaseURL}/modules-hrm/punch_in_out',
         method: "POST",
         data: data);
   }
 
-  // Future<Response> getAttandanceDetail() async {
-  //   return await networkClinet.sendRequest(
-  //     endPoint: '${NetworkClient().BaseURL}/modules-hrm/fetch_mobile_dashboard',
-  //     method: "GET",
-  //   );
-  // }
+  Future<Response> getAttandanceDetail() async {
+    return await networkClinet.sendRequest(
+      endPoint: '${NetworkClient().BaseURL}/modules-hrm/fetch_mobile_dashboard',
+      method: "GET",
+    );
+  }
 
   // Future<Response> getLocation(latitude, longitude) async {
   //   return await networkClinet.sendRequest(

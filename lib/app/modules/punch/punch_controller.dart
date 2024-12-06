@@ -47,7 +47,7 @@ class PunchController extends GetxController {
     ..sort((a, b) => b.dateTime!.compareTo(a.dateTime!)));
   }
 
-void addPunch(PunchModel punch) {
+void addPunch(PunchModel punch) async {
   isAdding.value = true; // Set loading state to true
 
   // Add punch to Hive box
@@ -57,6 +57,7 @@ void addPunch(PunchModel punch) {
   punchList.insert(0, punch);
 
   isAdding.value = false; // Set loading state to false
+  await BackgroundWorkDispatcher.SubmitPunchData();
 }
 
   void updatePunch(String id, PunchModel updatedPunch) {
@@ -213,6 +214,9 @@ void addPunch(PunchModel punch) {
           faceFound.value = false;
         }
       } catch (e) {
+        Logging().LoggerPrint(e.toString());
+       AlertNotification.error("Unable to recognize", "Please retry");
+
         // ScaffoldMessenger.of(context).showSnackBar(
         //     SnackBar(content: Text("Error during registration.")));
       } finally {
@@ -245,6 +249,7 @@ Future<bool> punchData(XFile imageFile,bool isPunchin) async {
       return true;
       // print(punchList);
     } catch (e) {
+      Logging().LoggerPrint(e.toString());
       AlertNotification.error("Unable to punch", "Please contact to admin");
       return false;
     }
@@ -263,10 +268,10 @@ Future<bool> punchData(XFile imageFile,bool isPunchin) async {
     isProcessing.value = true;
 
     try {
+      XFile imageFile = await cameraController.takePicture();
       isLoading.value = true;
 
       // Capture an image from the camera
-      XFile imageFile = await cameraController.takePicture();
 
       // Process punch data
       bool isPunched = await punchData(imageFile,isPunchin);
@@ -276,8 +281,8 @@ Future<bool> punchData(XFile imageFile,bool isPunchin) async {
 
       return true;
     } catch (e) {
-      print("Error during face detection---------------: $e");
-      AlertNotification.error("Failed!", "Cannot punch in. Report to a ");
+      Logging().LoggerPrint(e.toString());
+      AlertNotification.error("Failed!", "Cannot punch in. Report to admin ");
             return false;
 
     } finally {

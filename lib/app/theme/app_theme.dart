@@ -17,15 +17,32 @@ class AppTheme {
       backgroundColor: AppColors.primary,
       elevation: 0,
     ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary, // Set the background color
-        foregroundColor: Colors.white, // Set the text color
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8), // Optional: Rounded corners
+   elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          elevation: 0,
+          foregroundColor: Colors.white,
+          backgroundColor: AppColors.primary,
+          shape: RoundedRectangleBorder(
+              side: BorderSide(color: AppColors.primary, width: 1),
+              borderRadius: BorderRadius.circular(5)),
+          maximumSize: const Size(300, 45),
+          minimumSize: const Size(300, 45),
         ),
       ),
-    ),
+      inputDecorationTheme: const InputDecorationTheme(
+          filled: true,
+          fillColor: AppColors.secondary,
+          iconColor: AppColors.primary,
+          prefixIconColor: AppColors.primary,
+          contentPadding: EdgeInsets.symmetric(horizontal: 10),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+          ),
+          focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                  color: AppColors.primary,
+                  style: BorderStyle.solid,
+                  width: 2))),
     dialogBackgroundColor: AppColors.white,
 
   );
@@ -41,14 +58,32 @@ class AppTheme {
       // error: AppColors.black,
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.secondary, // Set background for dark theme
-        // foregroundColor: Colors.black, // Set text color for contrast
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+        style: ElevatedButton.styleFrom(
+          elevation: 0,
+          foregroundColor: Colors.white,
+          backgroundColor: AppColors.primary,
+          shape: RoundedRectangleBorder(
+              side: BorderSide(color: AppColors.primary, width: 1),
+              borderRadius: BorderRadius.circular(5)),
+          maximumSize: const Size(300, 45),
+          minimumSize: const Size(300, 45),
         ),
       ),
-    ),
+      inputDecorationTheme: const InputDecorationTheme(
+          filled: true,
+          fillColor: AppColors.secondary,
+          iconColor: AppColors.primary,
+          prefixIconColor: AppColors.primary,
+          contentPadding: EdgeInsets.symmetric(horizontal: 10),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+          ),
+          focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                  color: AppColors.primary,
+                  style: BorderStyle.solid,
+                  width: 2)))
+    
     
   );
 }

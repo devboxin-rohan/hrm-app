@@ -84,6 +84,22 @@ class _PunchPageState extends State<PunchPage> {
     }
   }
 
+   Future<void> markManually() async {
+    final isFaceDetected = await _faceDetectionUtil.captureAndDetectFaces(_cameraController!);
+    
+    bool? isPunchin = Get.arguments['isPunchin'];
+    bool? isRegister = Get.arguments['isRegister'];
+    // print("-------------punchin"+isPunchin.toString());
+    if ( !_hasPunched) {
+      setState(() {_hasPunched = true;});
+      await Get.find<PunchController>().captureAndPunch(_cameraController!,isPunchin!);
+      setState(() {_hasPunched = false;});
+      } 
+    }
+  
+
+
+
   @override
   Widget build(BuildContext context) {
     PunchController punchController = Get.find<PunchController>();
@@ -119,6 +135,7 @@ class _PunchPageState extends State<PunchPage> {
                       ),
                     ),
                   SizedBox(height: 20),
+                  ElevatedButton(onPressed:markManually, child: Text("Mark Manually"))
                 ],
               ),
         );

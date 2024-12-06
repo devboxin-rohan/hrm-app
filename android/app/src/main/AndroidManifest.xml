@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.devboxin.hrm_app">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.devboxin.hrm_store">
    
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -11,7 +11,7 @@
 
    
     <application
-        android:label="hrm_app"
+        android:label="Hrm store"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

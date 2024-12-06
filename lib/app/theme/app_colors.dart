@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const Color primary = Color.fromRGBO(126, 90, 240, 1.0);
+  static const Color primary = Color.fromRGBO(239, 83, 80, 1);
   static const Color secondary = Color.fromRGBO(250, 241, 255, 1.0);
   static const Color white = Colors.white;
   static const Color black = Colors.black;
@@ -18,6 +18,12 @@ class AppColors {
   static const TextStyle subtitleStyle = TextStyle(
     fontSize: 18,
     color: AppColors.grey,
+  );
+
+   static const TextStyle subtitleBoldStyle = TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
+    color: AppColors.black,
   );
 
   static const TextStyle subheadingStyle = TextStyle(

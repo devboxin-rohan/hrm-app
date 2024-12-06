@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hrm_app/app/modules/home/home_controller.dart';
 import 'package:hrm_app/app/utils/CheckPermission.dart';
 import 'package:get/get.dart';
+import 'package:hrm_app/main.dart';
 
 class PunchBtn extends StatefulWidget {
   const PunchBtn({Key? key}) : super(key: key);
@@ -17,10 +18,19 @@ class _PunchBtn extends State<PunchBtn> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    _handlePermissions();
+
     HomeController controller = Get.find<HomeController>();
     if(controller.isFaceAuthenticationAllowed.value){
      controller.fetchDetails();
     }
+  }
+
+
+  Future<void> _handlePermissions() async {
+    await checkPermissions();
+    await requestPermissions(navigatorKey.currentState!.context);
   }
 
 

@@ -16,11 +16,10 @@ AppBar CustomAppBar(){
               children: [
                 Container(
                   height: 40,
-                  margin:EdgeInsets.only(left: 20),
                   width: 180,
                   decoration:const BoxDecoration(
                     image: DecorationImage(
-                      image: AssetImage('assets/image/devlogo.png'),
+                      image: AssetImage('assets/image/logo.png'),
                     ),
                   ),
                 ),
