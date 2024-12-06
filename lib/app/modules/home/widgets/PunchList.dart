@@ -15,6 +15,7 @@ class PunchList extends StatefulWidget {
   @override
   _PunchList createState() => _PunchList();
 }
+
 class _PunchList extends State<PunchList> with WidgetsBindingObserver {
   List asyncData = [];
   late Worker _punchListWorker;
@@ -59,6 +60,9 @@ class _PunchList extends State<PunchList> with WidgetsBindingObserver {
         asyncData = punchController.punchList
             .where((punch) => punch.isSync == false)
             .toList();
+        if (asyncData.length == 0) {
+          asyncData = punchController.punchList.take(2).toList();
+        }
       } else {
         asyncData = punchController.punchList.toList();
       }
@@ -107,7 +111,10 @@ class _PunchList extends State<PunchList> with WidgetsBindingObserver {
               ],
             ),
             const SizedBox(height: 8),
-            if (asyncData.isEmpty) Text("No unsync punches recorded."),
+            if (asyncData.isEmpty)
+              Text(widget.isLoadUnsync
+                  ? "No unsync punches recorded."
+                  : "No punches recorded"),
             Column(
               children: List.generate(
                 widget.isLoadUnsync
@@ -205,12 +212,18 @@ class CardDetails extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                    details.isPunchin! ? 
-                    Text("Punch-in",style: AppColors.linkTextStyle.copyWith(color: AppColors.green),)
-                    :
-                    Text("Punch-out",style: AppColors.linkTextStyle.copyWith(color: AppColors.red)),
-                      
-                      SizedBox(width: 5,),
+                      details.isPunchin!
+                          ? Text(
+                              "Punch-in",
+                              style: AppColors.linkTextStyle
+                                  .copyWith(color: AppColors.green),
+                            )
+                          : Text("Punch-out",
+                              style: AppColors.linkTextStyle
+                                  .copyWith(color: AppColors.red)),
+                      SizedBox(
+                        width: 5,
+                      ),
                       details.isLoading
                           ? CircularProgressIndicator()
                           : CircleAvatar(

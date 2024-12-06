@@ -41,7 +41,7 @@ class BackgroundWorkDispatcher {
               filename: fileName,
             ),
             'date':punch.dateTime!.substring(0,10),  
-            'time':punch.dateTime!.substring(12,19),
+            'time':punch.dateTime!.substring(1,19),
             'is_punchin':punch.isPunchin==true?0:1
           });
 
