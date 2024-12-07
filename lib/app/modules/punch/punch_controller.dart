@@ -228,7 +228,7 @@ void addPunch(PunchModel punch) async {
 Future<bool> punchData(XFile imageFile,bool isPunchin) async {   
    try {
       final DateTime now = DateTime.now();
-      String timeNDate = DateFormat('yyyy/MM/dd hh:mm a').format(now);
+      String timeNDate = DateFormat('yyyy/MM/dd HH:mm').format(now);
 
       Position? position = await GetLatLong();
       AuthController controller = Get.find<AuthController>();

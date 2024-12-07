@@ -42,7 +42,7 @@ class AuthController extends GetxController {
         Get.offAllNamed('/home');
         AlertNotification.success("Success", "Login Successful");
       }else{
-          AlertNotification.error("Login Failed","Please check credentials");
+          AlertNotification.error("Login Failed",response.data["reason"]);
       }
     } catch (e) {
       Logging().LoggerPrint(e.toString());

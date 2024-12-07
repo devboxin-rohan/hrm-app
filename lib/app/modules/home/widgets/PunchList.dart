@@ -187,7 +187,7 @@ class CardDetails extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            details.dateTime!.substring(11, 19),
+                            details.dateTime!.substring(11, 16),
                             style: const TextStyle(
                               fontSize: kDefaultFontSize,
                               fontWeight: FontWeight.w500,

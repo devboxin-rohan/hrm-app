@@ -50,7 +50,7 @@ class BackgroundWorkDispatcher {
               'app_version':version,
               'mobile_login_code': device_code,
               'date': punch.dateTime!.substring(0, 10),
-              'time': get24HourFormat(punch.dateTime!.substring(11, 19)),
+              'time': punch.dateTime!.substring(11, 16),
               'is_punchin': punch.isPunchin == true ? 0 : 1
             });
 
