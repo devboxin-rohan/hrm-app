@@ -4,12 +4,14 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:hrm_app/app/data/local/local_storage.dart';
 
 Future<String> setDeviceId(context, empId) async {
+
   String mobilecode = "";
   if (Theme.of(context).platform == TargetPlatform.android)
     mobilecode=  await _getAndroidDeviceID(empId);
   else if (Theme.of(context).platform == TargetPlatform.iOS) _getIosDeviceID();
 
   return mobilecode;
+  
 }
 
 Future<String> _getAndroidDeviceID(empId) async {

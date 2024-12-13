@@ -11,8 +11,9 @@ import 'package:hrm_app/app/utils/RefreshToken.dart';
 import 'package:hrm_app/app/utils/help.dart';
 import 'package:hrm_app/app/utils/logging.dart';
 import 'package:hrm_app/app/utils/notifications.dart';
+import 'package:hrm_app/app/utils/widgets/Footer.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 
 // MyLogin Widget (Stateful)
 class MyLogin extends StatefulWidget {
@@ -29,14 +30,14 @@ class _MyLoginState extends State<MyLogin> {
   String password = "";
   bool isLoading = false;
   bool _passwordVisible = false;
+  bool ischecked = false;
   ScrollController _scrollController = ScrollController();
 
   TextEditingController inputEmail = TextEditingController();
   TextEditingController inputPassword = TextEditingController();
   var isDialOpen = ValueNotifier<bool>(false);
 
- var ver;
-  
+  var ver;
 
   @override
   void initState() {
@@ -46,15 +47,30 @@ class _MyLoginState extends State<MyLogin> {
     appversionControl();
   }
 
-
   void appversionControl() {
     PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
       String version = packageInfo.version;
-      setState(() {ver=version; });
+      setState(() {
+        ver = version;
+      });
     }).onError((error, stack) {
       Logging().LoggerPrint(error.toString());
     });
   }
+
+
+  Future<void> _openBrowser() async {
+    Uri toLaunch =
+        Uri(scheme: 'https', host: 'hrmstoreprivacy.blogspot.com', path: '/2024/12/terms-and-conditions.html');
+    if (!await launchUrl(
+      toLaunch,
+      mode: LaunchMode.externalApplication,
+    )) {
+      throw Exception('Could not launch $toLaunch');
+    }
+  }
+
+  
 
   // Main build method for UI
   @override
@@ -63,7 +79,7 @@ class _MyLoginState extends State<MyLogin> {
 
     return Scaffold(
       backgroundColor: AppColors.secondary,
-        floatingActionButton: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.end, children: [ Padding(padding: EdgeInsets.only(left: 30),child:Text("V ${ver}") ,) ,helpDesk(isDialOpen)]) ,
+      floatingActionButton: const FooterBar(),
       body: Stack(
         children: [
           Container(), // Background container
@@ -122,12 +138,33 @@ class _MyLoginState extends State<MyLogin> {
                             ),
                           ),
                         ),
-
-                        const SizedBox(height: 40),
-
+                        Row(
+                          children: [
+                            Checkbox(
+                                value: ischecked,
+                                onChanged: (checked) {
+                                  setState(() {
+                                    ischecked = checked!;
+                                  });
+                                }),
+                                GestureDetector(onTap: (){
+                                  _openBrowser();
+                                },
+                                child: Text("Accept terms and conditions",style: TextStyle(color: AppColors.blue,decoration: TextDecoration.underline)) ,
+                                )
+                          ],
+                        ),
+                        const SizedBox(height: 10),
                         // Login Button
                         ElevatedButton(
                           onPressed: () async {
+
+                            if(!ischecked){
+                              AlertNotification.error("Accept terms and conditions",
+                                  "Please click in checkbox to accept terms and condition ");
+                              return;
+                            }
+
                             setState(() {
                               isLoading = true;
                             });
@@ -140,13 +177,17 @@ class _MyLoginState extends State<MyLogin> {
                               });
 
                               if (isServer) {
-                                isLoading ? null : authController.login(inputEmail.text,inputPassword.text);
+                                isLoading
+                                    ? null
+                                    : authController.login(
+                                        inputEmail.text, inputPassword.text);
                               }
                             } else {
                               setState(() {
                                 isLoading = false;
                               });
-                              AlertNotification.error("Internet Issue", "Please check your internet connection");
+                              AlertNotification.error("Internet Issue",
+                                  "Please check your internet connection");
                             }
                           },
                           child: isLoading

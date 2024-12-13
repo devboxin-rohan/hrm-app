@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:hrm_app/app/modules/auth/widgets/login_page.dart';
 import 'package:hrm_app/app/theme/app_colors.dart';
 
-
 // Main Welcome Page
 class MyWelcomePage extends StatefulWidget {
   const MyWelcomePage({Key? key}) : super(key: key);
@@ -67,7 +66,7 @@ class _MyWelcomeState extends State<MyWelcomePage> {
     return Container(
       width: double.infinity,
       height: MediaQuery.of(context).size.height * 0.65,
-      decoration:const BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.primary,
         borderRadius: BorderRadius.only(
           bottomRight: Radius.circular(50),
@@ -138,7 +137,10 @@ class _MyWelcomeState extends State<MyWelcomePage> {
       child: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height * .65,
-        decoration: BoxDecoration(
+        constraints: const BoxConstraints(
+          maxHeight: 400,
+        ),
+        decoration: const BoxDecoration(
           color: AppColors.secondary,
           borderRadius: BorderRadius.only(topLeft: Radius.circular(50)),
         ),
@@ -154,7 +156,7 @@ class _MyWelcomeState extends State<MyWelcomePage> {
       children: [
         Container(
           padding: EdgeInsets.symmetric(horizontal: 30, vertical: 30),
-          child:const Text(
+          child: const Text(
             "Welcome to Hrm Service! Streamline your workforce with our intuitive platform, managing your details efficiently.",
             textAlign: TextAlign.center,
             style: TextStyle(

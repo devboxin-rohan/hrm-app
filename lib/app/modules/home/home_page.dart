@@ -12,6 +12,7 @@ import 'package:hrm_app/app/utils/help.dart';
 import 'package:hrm_app/app/utils/logging.dart';
 import 'package:hrm_app/app/utils/widgets/AppBar.dart';
 import 'package:hrm_app/app/utils/widgets/BottomNavigationBar.dart';
+import 'package:hrm_app/app/utils/widgets/Footer.dart';
 import 'package:hrm_app/main.dart';
 import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -98,7 +99,7 @@ class _HomePage extends State<HomePage>  with RouteAware{
     
     return Scaffold(
         // bottomNavigationBar: buildBottomNavigationBar(),
-        floatingActionButton: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.end, children: [ Padding(padding: EdgeInsets.only(left: 30),child:Text("V ${ver}") ,) ,helpDesk(isDialOpen)]) ,
+        floatingActionButton: FooterBar(),
         appBar: CustomAppBar(),
         // drawer: Drawer(),
         backgroundColor: AppColors.primary,
