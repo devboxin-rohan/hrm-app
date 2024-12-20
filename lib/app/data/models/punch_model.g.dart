@@ -27,13 +27,14 @@ class PunchModelAdapter extends TypeAdapter<PunchModel> {
       error: fields[7] as String?,
       user_id: fields[8] as int?,
       isPunchin: fields[9] as bool?,
+      app_type: fields[10] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, PunchModel obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -53,7 +54,9 @@ class PunchModelAdapter extends TypeAdapter<PunchModel> {
       ..writeByte(8)
       ..write(obj.user_id)
       ..writeByte(9)
-      ..write(obj.isPunchin);
+      ..write(obj.isPunchin)
+      ..writeByte(10)
+      ..write(obj.app_type);
   }
 
   @override

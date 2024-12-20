@@ -37,6 +37,9 @@ class PunchModel extends HiveObject {
   @HiveField(9)
   bool? isPunchin;
 
+   @HiveField(10)
+  String? app_type;
+
   PunchModel({
    this.id,
    this.imagePath,
@@ -47,7 +50,8 @@ class PunchModel extends HiveObject {
    this.isLoading=false,
    this.error,
    this.user_id,
-   this.isPunchin
+   this.isPunchin,
+   this.app_type
   });
 
   // Factory method to create a new PunchModel with a unique ID
@@ -60,7 +64,8 @@ class PunchModel extends HiveObject {
     bool isLoading=false,
     String? error,
     int? user_id,
-    bool? isPunchin
+    bool? isPunchin,
+    String? app_type
   }) {
     return PunchModel(
       id: Uuid().v4(),  // Generates a unique ID
@@ -72,7 +77,8 @@ class PunchModel extends HiveObject {
       isLoading: isLoading,
       error: error,
       user_id: user_id,
-      isPunchin: isPunchin
+      isPunchin: isPunchin,
+      app_type: app_type
     );
   }
 

@@ -41,7 +41,7 @@ class BackgroundWorkDispatcher {
           String fileName = basename(image.path);
           punch.isLoading = true;
           punchController.updatePunch(punch.id!, punch);
-
+          print(image.path);
           try {
             var payload = dio.FormData.fromMap({
               'longitude': punch.longitude,
@@ -53,8 +53,10 @@ class BackgroundWorkDispatcher {
               'app_version':version,
               'mobile_login_code': device_code,
               'date': punch.dateTime!.substring(0, 10),
-              'time': punch.dateTime!.substring(11, 16),
-              'is_punchin': punch.isPunchin == true ? 0 : 1
+              'time': punch.dateTime!.substring(11, 19),
+              'is_punchin': punch.isPunchin == true ? 1 : 0,
+              "emp_id": punch.user_id,
+              "app_type": punch.app_type
             });
 
             Logging().LoggerPrint(payload.fields.toString());

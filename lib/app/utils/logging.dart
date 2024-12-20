@@ -10,7 +10,6 @@ class Logging {
     var config = MyLogger.config;
     config.isDevelopmentDebuggingEnabled = false;
     config.timestampFormat = TimestampFormat.TIME_FORMAT_FULL_3;
-
     MyLogger.applyConfig(config);
   }
 

@@ -7,8 +7,10 @@ import 'package:dio/dio.dart' as dio;
 import 'package:hrm_app/app/data/local/hive_database.dart';
 import 'package:hrm_app/app/data/models/punch_model.dart';
 import 'package:hrm_app/app/modules/auth/auth_controller.dart';
+import 'package:hrm_app/app/modules/home/home_controller.dart';
 import 'package:hrm_app/app/service/face.dart';
 import 'package:hrm_app/app/utils/GetCurrentLocation.dart';
+import 'package:hrm_app/app/utils/GetPersistentFIlePath.dart';
 import 'package:hrm_app/app/utils/PunchAsyncData.dart';
 import 'package:hrm_app/app/utils/logging.dart';
 import 'package:hrm_app/app/utils/notifications.dart';
@@ -42,9 +44,10 @@ class PunchController extends GetxController {
   void loadPunchData() async {
     punchBox = Hive.box<PunchModel>(HiveDatabase.punchBoxName);
     AuthController controller = Get.find<AuthController>();
+    HomeController homeController = Get.find<HomeController>();
     var response = await controller.getUserData();
     punchList.assignAll(punchBox.values
-        .where((punch) => punch.user_id == response!.empId)
+        .where((punch) => homeController.isManualAllowed.value ? punch.user_id == response!.empId:true)
         .toList()
       ..sort((a, b) => b.dateTime!.compareTo(a.dateTime!)));
   }
@@ -120,7 +123,7 @@ class PunchController extends GetxController {
         // Prepare form data with image file and user information
         dio.FormData formData = dio.FormData.fromMap({
           "emp_id": response!.empId,
-          "emp_image":file,
+          "emp_image": file,
           "userName": response.name,
         });
 
@@ -152,8 +155,8 @@ class PunchController extends GetxController {
   }
 
   void runRecognize(String path, bool isPunchin) {
-    timer.value = Timer.periodic(Duration(seconds: 2),
-        (Timer t) => Recognize(path, isPunchin));
+    timer.value = Timer.periodic(
+        Duration(seconds: 2), (Timer t) => Recognize(path, isPunchin));
   }
 
   Future Recognize(String path, bool isPunchin) async {
@@ -230,10 +233,13 @@ class PunchController extends GetxController {
               await FaceService().RecognizeByAllFace(formData);
           if (response.data["success"] == true) {
             AlertNotification.success(
-                "Face found successfully", response.data["data"]["message"] +" "+response.data["data"]["employee_name"]);
+                "Face found successfully",
+                response.data["data"]["message"] +
+                    " " +
+                    response.data["data"]["employee_name"]);
             faceFound.value = true;
             isLoading.value = true;
-            bool isPunched = await punchData(path, isPunchin);
+            await punchData(path, isPunchin,response.data["data"]["emp_id"]);
             await Future.delayed(Duration(seconds: 1));
             isLoading.value = false;
           } else {
@@ -255,22 +261,29 @@ class PunchController extends GetxController {
     }
   }
 
-  Future<bool> punchData(String imagePath, bool isPunchin) async {
+  Future<bool> punchData(String imagePath, bool isPunchin, [int? id]) async {
     try {
       final DateTime now = DateTime.now();
-      String timeNDate = DateFormat('yyyy-MM-dd HH:mm').format(now);
-
-      Position? position = await GetLatLong();
+      String timeNDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
+      HomeController homeController = Get.find<HomeController>();
+      Position? position;
+      if (homeController.isManualAllowed.value) {
+        position = await GetLatLong();
+      }
       AuthController controller = Get.find<AuthController>();
       var response = await controller.getUserData();
+      String fixPath = await saveFileToPersistentStorage(File(imagePath));
+      var appType = homeController.isManualAllowed.value ? "Manual" : "lens";
+
       final punch = PunchModel.create(
-          imagePath: imagePath,
-          latitude: position!.latitude,
-          longitude: position!.longitude,
+          imagePath: fixPath,
+          latitude: position?.latitude,
+          longitude: position?.longitude,
           dateTime: timeNDate,
           isSync: false,
-          user_id: response!.empId,
-          isPunchin: isPunchin);
+          user_id: id ?? response!.empId,
+          isPunchin: isPunchin,
+          app_type: appType);
 
       addPunch(punch);
       // AlertNotification.success(
@@ -292,8 +305,7 @@ class PunchController extends GetxController {
     }
   }
 
-  Future<bool> captureAndPunch(
-      String path, bool isPunchin) async {
+  Future<bool> captureAndPunch(String path, bool isPunchin) async {
     if (!isProcessing.value) {
       isProcessing.value = true;
 
@@ -304,7 +316,7 @@ class PunchController extends GetxController {
         // Capture an image from the camera
 
         // Process punch data
-        bool isPunched = await punchData(path, isPunchin);
+        bool isPunched = await punchData(path, isPunchin,0);
         if (isPunched) {
           Get.toNamed("/home");
         }

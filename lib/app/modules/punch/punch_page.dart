@@ -137,7 +137,6 @@ class _PunchPageState extends State<PunchPage> {
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
-
                     // SizedBox(height: 20),
                     // ElevatedButton(
                     //     onPressed: markManually, child: Text("Mark Manually"))
