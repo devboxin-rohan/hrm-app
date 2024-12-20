@@ -18,6 +18,13 @@ class UserService {
     );
   }
 
+   Future<Response> GetUserSetting() async {
+    return await networkClinet.sendRequest(
+      endPoint: '${NetworkClient().BaseURL}/modules-hrm/user-settings',
+      method: "GET",
+    );
+  }
+
   Future<Response> RefreshToken() async {
     return await networkClinet.sendRequest(
       endPoint: '${NetworkClient().BaseURL}/refresh-token',

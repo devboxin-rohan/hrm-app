@@ -39,25 +39,28 @@ class PunchController extends GetxController {
     loadPunchData();
   }
 
-  void loadPunchData() async{
+  void loadPunchData() async {
     punchBox = Hive.box<PunchModel>(HiveDatabase.punchBoxName);
     AuthController controller = Get.find<AuthController>();
     var response = await controller.getUserData();
-    punchList.assignAll(punchBox.values.where((punch) => punch.user_id == response!.empId).toList()
-    ..sort((a, b) => b.dateTime!.compareTo(a.dateTime!)));
+    punchList.assignAll(punchBox.values
+        .where((punch) => punch.user_id == response!.empId)
+        .toList()
+      ..sort((a, b) => b.dateTime!.compareTo(a.dateTime!)));
   }
 
-void addPunch(PunchModel punch) {
-  isAdding.value = true; // Set loading state to true
+  void addPunch(PunchModel punch) async {
+    isAdding.value = true; // Set loading state to true
 
-  // Add punch to Hive box
-  punchBox.put(punch.id, punch);
+    // Add punch to Hive box
+    punchBox.put(punch.id, punch);
 
-  // Add punch to the top of the list
-  punchList.insert(0, punch);
+    // Add punch to the top of the list
+    punchList.insert(0, punch);
 
-  isAdding.value = false; // Set loading state to false
-}
+    isAdding.value = false; // Set loading state to false
+    // await BackgroundWorkDispatcher.SubmitPunchData();
+  }
 
   void updatePunch(String id, PunchModel updatedPunch) {
     punchBox.put(id, updatedPunch);
@@ -100,37 +103,24 @@ void addPunch(PunchModel punch) {
     // });
   }
 
-  Future Register(CameraController cameraController) async {
-    if (cameraController != null &&
-        cameraController.value.isInitialized &&
-        !isProcessing.value) {
+  Future Register(String path) async {
+    if (!isProcessing.value) {
       isProcessing.value = true;
 
       try {
         // Capture an image from the camera
-        XFile? imageFile = await cameraController.takePicture();
-
-        // Check if the file was actually created
-        if (imageFile == null || !(await File(imageFile.path).exists())) {
-          print(
-              "Error: Captured image file not found at path: ${imageFile?.path}");
-          isProcessing.value = false;
-          return;
-        }
-
-        // Convert XFile to File for compatibility
-        File image = File(imageFile.path);
-        String fileName = image.path.split('/').last;
-
-        // Get user data for form submission
+        File image = File(path);
         AuthController controller = Get.find<AuthController>();
         var response = await controller.getUserData();
+        String fileName = image.path.split('/').last;
+
+        dio.MultipartFile file =
+            await dio.MultipartFile.fromFile(image.path, filename: fileName);
 
         // Prepare form data with image file and user information
         dio.FormData formData = dio.FormData.fromMap({
           "emp_id": response!.empId,
-          "emp_image":
-              await dio.MultipartFile.fromFile(image.path, filename: fileName),
+          "emp_image":file,
           "userName": response.name,
         });
 
@@ -138,14 +128,13 @@ void addPunch(PunchModel punch) {
         print("Form Data Fields: ${formData.fields}");
 
         try {
-          // Send the form data
+          // Send the form datas
           dio.Response res = await FaceService().RegisterFace(formData);
-          if(res.data["success"]==true)
-         {AlertNotification.success(res.data["message"], "");
-          Get.toNamed("/home");}
-          else
-          AlertNotification.error("Failed !", res.data["message"]);
-
+          if (res.data["success"] == true) {
+            AlertNotification.success(res.data["message"], "");
+            Get.toNamed("/home");
+          } else
+            AlertNotification.error("Failed !", res.data["message"]);
         } catch (error) {
           Logging().LoggerPrint(error.toString());
           print("Error during face registration: $error");
@@ -162,48 +151,45 @@ void addPunch(PunchModel punch) {
     }
   }
 
-  void runRecognize(CameraController cameraController,bool isPunchin) {
-    timer.value = Timer.periodic(
-        Duration(seconds: 2), (Timer t) => Recognize(cameraController, isPunchin));
+  void runRecognize(String path, bool isPunchin) {
+    timer.value = Timer.periodic(Duration(seconds: 2),
+        (Timer t) => Recognize(path, isPunchin));
   }
 
-  Future Recognize(CameraController cameraController,bool isPunchin) async {
-    if (cameraController != null &&
-        cameraController!.value.isInitialized &&
-        !isProcessing.value) {
+  Future Recognize(String path, bool isPunchin) async {
+    if (!isProcessing.value) {
       isProcessing.value = true;
 
       try {
         // Capture an image from the camera
-        XFile imageFile = await cameraController!.takePicture();
-        File image = File(imageFile.path);
-
+        File image = File(path);
         AuthController controller = Get.find<AuthController>();
         var response = await controller.getUserData();
         String fileName = image.path.split('/').last;
+
         dio.MultipartFile file =
             await dio.MultipartFile.fromFile(image.path, filename: fileName);
 
         dio.FormData formData = dio.FormData.fromMap({
           "emp_id": response!.empId,
-          "emp_image": file,
+          "face_encoding": file,
         });
 
         try {
-          dio.Response response = await FaceService().RecognizeFace(formData);
+          dio.Response response = await FaceService().RecognizeIdFace(formData);
           if (response.data["success"] == true) {
             AlertNotification.success(
                 "Face found successfully", response.data["message"]);
             faceFound.value = true;
             isLoading.value = true;
-            bool isPunched = await punchData(imageFile,isPunchin);
+            bool isPunched = await punchData(path, isPunchin);
             if (isPunched) {
               isLoading.value = false;
               Get.toNamed("/home");
             }
             isLoading.value = false;
-            timer.value!.cancel();
-          }else{
+            // timer.value!.cancel();
+          } else {
             AlertNotification.error("Failed !", response.data["message"]);
             faceFound.value = false;
           }
@@ -213,38 +199,86 @@ void addPunch(PunchModel punch) {
           faceFound.value = false;
         }
       } catch (e) {
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //     SnackBar(content: Text("Error during registration.")));
+        Logging().LoggerPrint(e.toString());
+        AlertNotification.error("Unable to recognize", "Please retry");
       } finally {
         isProcessing.value = false;
       }
     }
   }
 
-Future<bool> punchData(XFile imageFile,bool isPunchin) async {   
-   try {
+  Future RecognizeByAll(String path, bool isPunchin) async {
+    if (!isProcessing.value) {
+      isProcessing.value = true;
+
+      try {
+        // Capture an image from the camera
+        File image = File(path);
+        AuthController controller = Get.find<AuthController>();
+        var response = await controller.getUserData();
+        String fileName = image.path.split('/').last;
+
+        dio.MultipartFile file =
+            await dio.MultipartFile.fromFile(image.path, filename: fileName);
+
+        dio.FormData formData = dio.FormData.fromMap({
+          "face_encoding": file,
+        });
+
+        try {
+          dio.Response response =
+              await FaceService().RecognizeByAllFace(formData);
+          if (response.data["success"] == true) {
+            AlertNotification.success(
+                "Face found successfully", response.data["data"]["message"] +" "+response.data["data"]["employee_name"]);
+            faceFound.value = true;
+            isLoading.value = true;
+            bool isPunched = await punchData(path, isPunchin);
+            await Future.delayed(Duration(seconds: 1));
+            isLoading.value = false;
+          } else {
+            AlertNotification.error(
+                "Failed !", response.data["data"]["message"]);
+            faceFound.value = false;
+          }
+        } catch (e) {
+          AlertNotification.error("Failed !", "Face not recognized");
+          Logging().LoggerPrint(e.toString());
+          faceFound.value = false;
+        }
+      } catch (e) {
+        Logging().LoggerPrint(e.toString());
+        AlertNotification.error("Unable to recognize", "Please retry");
+      } finally {
+        isProcessing.value = false;
+      }
+    }
+  }
+
+  Future<bool> punchData(String imagePath, bool isPunchin) async {
+    try {
       final DateTime now = DateTime.now();
-      String timeNDate = DateFormat('yyyy/MM/dd hh:mm a').format(now);
+      String timeNDate = DateFormat('yyyy-MM-dd HH:mm').format(now);
 
       Position? position = await GetLatLong();
       AuthController controller = Get.find<AuthController>();
       var response = await controller.getUserData();
       final punch = PunchModel.create(
-          imagePath: imageFile!.path,
+          imagePath: imagePath,
           latitude: position!.latitude,
           longitude: position!.longitude,
           dateTime: timeNDate,
           isSync: false,
           user_id: response!.empId,
-          isPunchin: isPunchin
-         );
+          isPunchin: isPunchin);
 
       addPunch(punch);
-      AlertNotification.success(
-          "Punched successfully", "Your attendace is save locally ");
+      // AlertNotification.success(
+      //     "Punched successfully", "Your attendace is save locally ");
       return true;
-      // print(punchList);
+      // print(punchList);s
     } catch (e) {
+      Logging().LoggerPrint(e.toString());
       AlertNotification.error("Unable to punch", "Please contact to admin");
       return false;
     }
@@ -258,39 +292,34 @@ Future<bool> punchData(XFile imageFile,bool isPunchin) async {
     }
   }
 
- Future<bool> captureAndPunch(CameraController cameraController,bool isPunchin) async {
-  if (cameraController.value.isInitialized && !isProcessing.value) {
-    isProcessing.value = true;
+  Future<bool> captureAndPunch(
+      String path, bool isPunchin) async {
+    if (!isProcessing.value) {
+      isProcessing.value = true;
 
-    try {
-      isLoading.value = true;
+      try {
+        // Capture an image from the camera
+        File image = File(path);
+        isLoading.value = true;
+        // Capture an image from the camera
 
-      // Capture an image from the camera
-      XFile imageFile = await cameraController.takePicture();
-
-      // Process punch data
-      bool isPunched = await punchData(imageFile,isPunchin);
-      if (isPunched) {
-        Get.toNamed("/home");
+        // Process punch data
+        bool isPunched = await punchData(path, isPunchin);
+        if (isPunched) {
+          Get.toNamed("/home");
+        }
+        return true;
+      } catch (e) {
+        Logging().LoggerPrint(e.toString());
+        AlertNotification.error("Failed!", "Cannot punch in. Report to admin ");
+        return false;
+      } finally {
+        isLoading.value = false;
+        isProcessing.value = false;
+        return true;
       }
-
-      return true;
-    } catch (e) {
-      print("Error during face detection---------------: $e");
-      AlertNotification.error("Failed!", "Cannot punch in. Report to a ");
-            return false;
-
-    } finally {
-      isLoading.value = false;
-      isProcessing.value = false;
-      return true;
+    } else {
+      return false;
     }
   }
-  else{
-    return false;
-  }
-}
-
-
-
 }

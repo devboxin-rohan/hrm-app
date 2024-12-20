@@ -11,9 +11,17 @@ class FaceService {
         data: data);
   }
 
-  Future<Response> RecognizeFace(data) async {
+  Future<Response> RecognizeIdFace(data) async {
     return await networkClinet.sendRequest(
         endPoint: '${FaceNetworkCLient().BaseURL}/verify',
+        method: "POST",
+        data: data
+    );
+  }
+
+  Future<Response> RecognizeByAllFace(data) async {
+    return await networkClinet.sendRequest(
+        endPoint: '${FaceNetworkCLient().BaseURL}/recognize',
         method: "POST",
         data: data
     );

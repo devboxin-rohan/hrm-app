@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:hrm_app/app/data/local/local_storage.dart';
 import 'package:hrm_app/app/modules/auth/auth_binding.dart';
 import 'package:hrm_app/app/modules/auth/auth_page.dart';
+import 'package:hrm_app/app/modules/auth/widgets/welcome_page.dart';
 import 'package:hrm_app/app/modules/home/home_page.dart';
 import 'package:hrm_app/app/modules/leave/leave_binding.dart';
 import 'package:hrm_app/app/modules/leave/leave_page.dart';
@@ -25,7 +26,7 @@ class AppPages {
     ),
     GetPage(
       name: '/auth',
-      page: () => LoginScreen(),
+      page: () => const MyWelcomePage(),
       binding: AuthBinding(),
     ),
     GetPage(

@@ -223,8 +223,8 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         ),
         ElevatedButton(
           onPressed: () {
-            authController
-                .login(); // Calls the login function from AuthController
+            // authController
+            //     .login(); // Calls the login function from AuthController
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,

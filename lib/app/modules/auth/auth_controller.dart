@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:hrm_app/app/data/local/hive_database.dart';
 import 'package:hrm_app/app/data/local/local_storage.dart';
 import 'package:hrm_app/app/data/models/user_model.dart';
+import 'package:hrm_app/app/service/attendance.dart';
 import 'package:hrm_app/app/service/auth.dart';
+import 'package:hrm_app/app/utils/logging.dart';
 import 'package:hrm_app/app/utils/notifications.dart';
 import 'package:hive/hive.dart';
 
@@ -17,16 +19,17 @@ class AuthController extends GetxController {
 
   final UserService _userService = UserService();
 
-  Future<void> login() async {
+  Future<void> login(email,password) async {
     isLoading.value = true;
     final credentials = {
-      'email': username.value,
-      'password': password.value,
+      'email': email,
+      'password': password,
     };
 
     try {
       dio.Response response = await _userService.SubmitCredential(credentials);
-      print(response.data);
+      Logging().LoggerPrint(response.toString());
+
       if( response.data["success"]==true){
         var userData = response.data["data"]["user"];
         var token = response.data["data"]["token"];
@@ -34,26 +37,41 @@ class AuthController extends GetxController {
         userData["token"]=token;
         SharedData().setToken(token);
         await saveUserData(userData);
+        await handleDahboardData();
         isLoggedIn.value = true;
         Get.offAllNamed('/home');
         AlertNotification.success("Success", "Login Successful");
       }else{
-          AlertNotification.error("Login Failed","Some issue occur");
+          AlertNotification.error("Login Failed",response.data["reason"]);
       }
     } catch (e) {
+      Logging().LoggerPrint(e.toString());
       print(e.toString());
-      AlertNotification.error("Login Failed","Some issue occur");
+      AlertNotification.error("Login Failed","Please check credentials");
     } finally {
       isLoading.value = false;
     }
   }
 
  Future<void> saveUserData(Map<String, dynamic> userData) async {
+    Logging().LoggerPrint(userData.toString());
     final user = UserModel.fromJson(userData);  // Create UserModel from JSON
     // if (rememberMe.value) {
       var box = await Hive.box<UserModel>(HiveDatabase.userBoxName);
       await box.put('user', user);  // Save the user model
     // }
+  }
+
+  Future handleDahboardData() async {
+    try {
+      dio.Response dashboardResponse =
+          await AttendanceService().getAttandanceDetail();
+      SharedData().setDashboardDetail(dashboardResponse.data);
+    } catch (e) {
+      Logging().LoggerPrint(e.toString());
+    } finally {
+      return;
+    }
   }
 
    Future<UserModel?> getUserData() async {

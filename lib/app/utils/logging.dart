@@ -1,8 +1,9 @@
 import 'dart:io';
+import 'package:camera/camera.dart';
 import 'package:my_logger/logger.dart';
 import 'package:my_logger/logger_core.dart';
 import 'package:permission_handler/permission_handler.dart';
-// import 'package:share_plus/share_plus.dart';
+import 'package:share_plus/share_plus.dart';
 
 class Logging {
   init() {
@@ -33,7 +34,7 @@ class Logging {
       filter: LogFilter.last24Hours(),
     );
 
-    // Share.shareXFiles([XFile(fileExport.path)], text: 'Report File ',);
+    Share.shareXFiles([XFile(fileExport.path)], text: 'Report File ',);
 
     print("Logs are exported into: $fileExport");
   }

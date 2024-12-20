@@ -1,13 +1,22 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:hrm_app/app/data/local/local_storage.dart';
+import 'package:hrm_app/app/modules/home/widgets/AppUpdateDialog.dart';
 import 'package:hrm_app/app/modules/home/widgets/PunchBtn.dart';
 import 'package:hrm_app/app/modules/home/widgets/PunchList.dart';
+import 'package:hrm_app/app/service/attendance.dart';
 import 'package:hrm_app/app/theme/app_colors.dart';
+import 'package:hrm_app/app/utils/DeviceId.dart';
 import 'package:hrm_app/app/utils/RefreshToken.dart';
+import 'package:hrm_app/app/utils/help.dart';
+import 'package:hrm_app/app/utils/logging.dart';
 import 'package:hrm_app/app/utils/widgets/AppBar.dart';
 import 'package:hrm_app/app/utils/widgets/BottomNavigationBar.dart';
+import 'package:hrm_app/app/utils/widgets/Footer.dart';
 import 'package:hrm_app/main.dart';
 import 'package:get/get.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+
 
 class HomePage extends StatefulWidget {
   @override
@@ -15,12 +24,73 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePage extends State<HomePage>  with RouteAware{
-  
+  var isDialOpen = ValueNotifier<bool>(false);
+  var _deviceID;
+  var dashboardDetails;
+  var name;
+  var ver;
+
   @override
-  initState(){
+  void initState() {
     super.initState();
-    checkTimeAndTriggerFunction(navigatorKey.currentState!.context);
-    Timer.periodic(Duration(minutes: 15), (Timer t){checkTimeAndTriggerFunction(navigatorKey.currentState!.context);});
+    // Get.put(PunchController());
+    initializeDashboard();
+  }
+
+  void initializeDashboard() async {
+    // fetchLocation();
+    // fetchDashboardDetails();
+
+    checkTimeAndTriggerFunction(context);
+    Timer.periodic(Duration(minutes: 5),
+        (Timer t) => checkTimeAndTriggerFunction(context));
+
+    var data = await SharedData().getDashboardDetail();
+    String deviceCode = await setDeviceId(context, data["user_id"]);
+    SharedData().setDeviceId(deviceCode);
+    setState(() {
+      dashboardDetails = data;
+      _deviceID = deviceCode;
+      name = data["emp_name"];
+    });
+
+    appversionControl();
+    print(dashboardDetails.toString() + "_-----" + _deviceID.toString());
+    // _getTime();
+  }
+
+  void appversionControl() {
+    PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
+      String version = packageInfo.version;
+      setState(() {ver=version; });
+      Logging().LoggerPrint("---------------- ${version} --------------------");
+      AttendanceService().getAttandanceDetail().then((value) async {
+        if (value.data != null &&
+            value.data["app_version"] != null &&
+            value.data["app_version"]["version"] != version) {
+          showUpdateDialog(value.data);
+        }
+      });
+    }).onError((error, stack) {
+      Logging().LoggerPrint(error.toString());
+    });
+  }
+
+  void showUpdateDialog(dynamic decodedData) {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return WillPopScope(
+            onWillPop: () => Future.value(false),
+            child: UpdateAlertDailog(
+              appVersion: decodedData["app_version"]["version"],
+              latestVersion: decodedData["app_version"]["version"],
+              link: decodedData["app_version"]["app_link"],
+              forceUpdate: decodedData["app_version"]["force_update"],
+            ),
+          );
+        });
   }
 
   @override
@@ -28,15 +98,15 @@ class _HomePage extends State<HomePage>  with RouteAware{
     // print(controller.dashboardData.value.name);
     
     return Scaffold(
-        bottomNavigationBar: buildBottomNavigationBar(),
-        // floatingActionButton: helpDesk(isDialOpen),
+        // bottomNavigationBar: buildBottomNavigationBar(),
+        floatingActionButton: FooterBar(),
         appBar: CustomAppBar(),
         // drawer: Drawer(),
         backgroundColor: AppColors.primary,
         body: Container(
           height: double.maxFinite,
           width: double.maxFinite,
-          padding: const EdgeInsets.only(left: 20, right: 20),
+          padding: const EdgeInsets.only(left: 20, right: 20,top: 10),
           decoration: const BoxDecoration(
               color: AppColors.secondary,
               borderRadius: BorderRadius.only(topLeft: Radius.circular(50))),
@@ -45,14 +115,20 @@ class _HomePage extends State<HomePage>  with RouteAware{
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
-                height: 20,
+                height: 10,
               ),
               WelcomeBoard(),
               SizedBox(
                 height: 20,
               ),
               PunchList(isLoadUnsync: true,),
+               SizedBox(
+                height: 20,
+              ),
               PunchBtn(),
+               SizedBox(
+                height: 100,
+              ),
               // Container(width: 200,height: 200,color: Colors.black,),
             ],
           )),
@@ -89,15 +165,15 @@ class _HomePage extends State<HomePage>  with RouteAware{
                         .size
                         .width *
                     0.4,
-                child: const Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       "Welcome",
-                       style: AppColors.headerTextStyle,
+                      style:  AppColors.subheadingStyle,
                     ),
                     Text(
-                      'Team',
+                      dashboardDetails?["emp_name"]?.toString() ?? '',
                       style: AppColors.labelTextStyle,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -105,10 +181,10 @@ class _HomePage extends State<HomePage>  with RouteAware{
                 ),
               ),
               SizedBox(height: 15),
-              // Text(
-              //   "Hello Team",
-              //   style: TextStyle(fontSize: 12),
-              // ),
+              Text(
+                "Device id :- $_deviceID",
+                style: TextStyle(fontSize: 12),
+              ),
             ],
           ),
           Container(

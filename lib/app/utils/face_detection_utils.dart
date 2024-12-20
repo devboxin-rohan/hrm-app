@@ -28,7 +28,7 @@ class FaceDetectionUtil {
   }
 
   /// Capture image and detect faces
-  Future<bool> captureAndDetectFaces(CameraController cameraController) async {
+  Future captureAndDetectFaces(CameraController cameraController) async {
     if (_isDetecting) return false;  // Prevent concurrent captures
     _isDetecting = true;
 
@@ -37,10 +37,15 @@ class FaceDetectionUtil {
       final inputImage = InputImage.fromFilePath(imageFile.path);
       final faces = await _faceDetector.processImage(inputImage);
 
-      return faces.isNotEmpty;
+      if(faces.isNotEmpty){
+      return inputImage.filePath;
+      }
+      else{
+      return ;
+      }
     } catch (e) {
-      print("Error during face detection: $e");
-      return false;
+      // print("Error during face detection: $e");
+      return ;
     } finally {
       _isDetecting = false;
     }

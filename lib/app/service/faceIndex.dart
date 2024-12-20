@@ -5,7 +5,7 @@ import 'package:hrm_app/app/data/local/local_storage.dart';
 import 'package:hrm_app/app/utils/logging.dart';
 
 class FaceNetworkCLient {
-  String BaseURL = "https://face-api.developerbox.co.in";
+  String BaseURL = "https://hrm-face.developerbox.co.in";
 
   Future<Response> sendRequest({
     required String endPoint,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hrm_app/app/modules/home/home_controller.dart';
 import 'package:hrm_app/app/utils/CheckPermission.dart';
 import 'package:get/get.dart';
+import 'package:hrm_app/main.dart';
 
 class PunchBtn extends StatefulWidget {
   const PunchBtn({Key? key}) : super(key: key);
@@ -17,10 +18,20 @@ class _PunchBtn extends State<PunchBtn> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    _handlePermissions();
+
     HomeController controller = Get.find<HomeController>();
-    if(controller.isFaceAuthenticationAllowed.value){
-     controller.fetchDetails();
-    }
+    controller.fetchuserSettings();
+    // if(controller.isFaceAuthenticationAllowed.value){
+    //  controller.fetchDetails();
+    // }
+  }
+
+
+  Future<void> _handlePermissions() async {
+    await checkPermissions();
+    await requestPermissions(navigatorKey.currentState!.context);
   }
 
 
@@ -29,7 +40,7 @@ class _PunchBtn extends State<PunchBtn> {
     HomeController controller = Get.find<HomeController>();
     
     return Obx((){
-      if(controller.isFaceAuthenticationAllowed.value && !controller.isFaceExist.value)
+      if(controller.isFaceAuthenticationAllowed.value && !controller.isFaceExist.value && controller.isManualAllowed.value)
       {return  ElevatedButton(
           style:  ButtonStyle(
             maximumSize: WidgetStatePropertyAll(Size(MediaQuery.of(context).size.width*1, 45)),
@@ -40,7 +51,8 @@ class _PunchBtn extends State<PunchBtn> {
             "Register Face",
             style: TextStyle(color: Colors.white),
           ),
-        );}
+        );
+        }
       else{
       return Row(children: [
          ElevatedButton(

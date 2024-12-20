@@ -16,9 +16,11 @@ class PunchPage extends StatefulWidget {
 }
 
 class _PunchPageState extends State<PunchPage> {
-   CameraController? _cameraController;
+  CameraController? _cameraController;
   late FaceDetectionUtil _faceDetectionUtil;
-  bool _hasPunched = false;
+  bool _hasPunched = false; // Ensures a single punch is registered
+  bool _isApiRunning = false; // Prevents multiple API calls
+  Timer? _timer;
 
   HomeController homeController = Get.find<HomeController>();
 
@@ -33,17 +35,19 @@ class _PunchPageState extends State<PunchPage> {
 
   @override
   void dispose() {
-    _cameraController!.dispose();
+    _cameraController?.dispose();
     _faceDetectionUtil.dispose();
+    _timer?.cancel(); // Stop the timer to prevent memory leaks
     super.dispose();
   }
 
   Future<void> _initializeCamera() async {
     _cameraController = await _faceDetectionUtil.initializeCamera();
     setState(() {});
-    Timer.periodic(Duration(seconds: 2), (Timer t) {
-      if (!_hasPunched) {
-        _captureAndDetectFaces();
+
+    _timer = Timer.periodic(Duration(seconds: 2), (Timer t) async {
+      if (!_hasPunched && !_isApiRunning) {
+        await _captureAndDetectFaces();
       }
     });
   }
@@ -54,33 +58,47 @@ class _PunchPageState extends State<PunchPage> {
   }
 
   Future<void> _captureAndDetectFaces() async {
-    final isFaceDetected = await _faceDetectionUtil.captureAndDetectFaces(_cameraController!);
+    _isApiRunning = true;
+
+    final imagePath =
+        await _faceDetectionUtil.captureAndDetectFaces(_cameraController!);
     
-    bool? isPunchin = Get.arguments['isPunchin'];
-    bool? isRegister = Get.arguments['isRegister'];
-    // print("-------------punchin"+isPunchin.toString());
-    if (isFaceDetected &&  !_hasPunched) {
-      setState(() {_hasPunched = true;});
-      print("------------------ ${isFaceDetected}");
-      
-      if(homeController.isFaceAuthenticationAllowed.value)
-      {  
-        print("--------------- ${homeController.isFaceAuthenticationAllowed.value} ${homeController.isFaceExist.value}");
-        if(homeController.isFaceExist.value)
-        await Get.find<PunchController>().Recognize(_cameraController!,isPunchin!);
-        else
-        await Get.find<PunchController>().Register(_cameraController!);
+    if (imagePath != null && !_hasPunched) {
+
+      _hasPunched = true;
+
+      bool? isPunchin = Get.arguments['isPunchin'];
+
+      // // Determine the correct API call
+      try {
+        if (homeController.isManualAllowed.value) {
+          if (homeController.isFaceAuthenticationAllowed.value) {
+            if (homeController.isFaceExist.value) {
+              await Get.find<PunchController>()
+                  .Recognize(imagePath, isPunchin!);
+            } else {
+              await Get.find<PunchController>().Register(imagePath);
+            }
+          } else {
+            await Get.find<PunchController>()
+                .captureAndPunch(imagePath, isPunchin!);
+          }
+        } else {
+          if (homeController.isFaceAuthenticationAllowed.value) {
+            await Get.find<PunchController>()
+                .RecognizeByAll(imagePath, isPunchin!);
+          } else {
+            await Get.find<PunchController>()
+                .captureAndPunch(imagePath, isPunchin!);
+          }
+        }
+      } finally {
+          _hasPunched = false;
+        _isApiRunning = false;
       }
-      else{
-        print("--------------- ${homeController.isFaceAuthenticationAllowed.value} ${homeController.isFaceExist.value} ${homeController.isFaceAuthenticationAllowed.value}");
-        await Get.find<PunchController>().captureAndPunch(_cameraController!,isPunchin!);
-      }
-    
-      setState(() {_hasPunched = false;});
-      
-      // Get.toNamed("/home");  // Navigate to home page
     } else {
       print("No faces detected.");
+      _isApiRunning = false; // Allow new attempts even if no faces detected
     }
   }
 
@@ -88,7 +106,7 @@ class _PunchPageState extends State<PunchPage> {
   Widget build(BuildContext context) {
     PunchController punchController = Get.find<PunchController>();
 
-    return  Scaffold(
+    return Scaffold(
       appBar: CustomAppBar(),
       backgroundColor: AppColors.secondary,
       body: Obx(() {
@@ -96,31 +114,35 @@ class _PunchPageState extends State<PunchPage> {
           child: punchController.isLoading.value
               ? CircularProgressIndicator()
               : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Check if the camera is initialized
-                  if (_cameraController!=null && _cameraController!.value.isInitialized)
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(
-                        MediaQuery.of(context).size.width * 0.1,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Check if the camera is initialized
+                    if (_cameraController != null &&
+                        _cameraController!.value.isInitialized)
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(
+                          MediaQuery.of(context).size.width * 0.1,
+                        ),
+                        child: CameraPreview(_cameraController!),
+                      )
+                    else
+                      // Show a placeholder or loading indicator while the camera initializes
+                      Container(
+                        height: MediaQuery.of(context).size.width * 0.6,
+                        width: MediaQuery.of(context).size.width * 0.6,
+                        color: Colors.black,
+                        alignment: Alignment.center,
+                        child: Text(
+                          "Initializing Camera...",
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
-                      child: CameraPreview(_cameraController!),
-                    )
-                  else
-                    // Show a placeholder or loading indicator while the camera initializes
-                    Container(
-                      height: MediaQuery.of(context).size.width * 0.6,
-                      width: MediaQuery.of(context).size.width * 0.6,
-                      color: Colors.black,
-                      alignment: Alignment.center,
-                      child: Text(
-                        "Initializing Camera...",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  SizedBox(height: 20),
-                ],
-              ),
+
+                    // SizedBox(height: 20),
+                    // ElevatedButton(
+                    //     onPressed: markManually, child: Text("Mark Manually"))
+                  ],
+                ),
         );
       }),
     );

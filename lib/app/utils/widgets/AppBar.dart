@@ -14,13 +14,14 @@ AppBar CustomAppBar(){
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                
                 Container(
                   height: 40,
-                  margin:EdgeInsets.only(left: 20),
                   width: 180,
+                  margin: EdgeInsets.only(left: 20),
                   decoration:const BoxDecoration(
                     image: DecorationImage(
-                      image: AssetImage('assets/image/devlogo.png'),
+                      image: AssetImage('assets/image/logo.png'),
                     ),
                   ),
                 ),

@@ -16,6 +16,8 @@ class AlertNotification {
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: AppColors.white,
       colorText: colorText,
+      animationDuration: Duration(milliseconds: 100),
+      duration: Duration(seconds: 1)
     );
   }
 
